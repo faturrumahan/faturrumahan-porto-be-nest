@@ -4,6 +4,7 @@
     {
       "src": "/(.*)",
       "dest": "/dist/main",
+      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE"]
     }
   ]
 }

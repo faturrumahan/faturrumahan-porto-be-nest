@@ -63,13 +63,13 @@ export class ProjectsController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   findAll(): Promise<Project[]> {
     return this.projectService.findAll();
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: number): Promise<Project> {
     return this.projectService.findOne(id);
   }

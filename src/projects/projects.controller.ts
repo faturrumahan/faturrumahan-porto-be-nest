@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { Project } from './projects.entity';
-import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import axios from 'axios';
@@ -63,13 +63,13 @@ export class ProjectsController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   findAll(): Promise<Project[]> {
     return this.projectService.findAll();
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: number): Promise<Project> {
     return this.projectService.findOne(id);
   }

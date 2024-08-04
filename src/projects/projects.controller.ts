@@ -59,19 +59,37 @@ export class ProjectsController {
     project.image_path = imgurLinks.join(',');
     project.image_delete_id = imgurDeleteHash.join(',');
 
-    return this.projectService.createProject(project);
+    return {
+      status: 'success',
+      data: this.projectService.createProject(project),
+    };
   }
 
   @Get()
   // @UseGuards(JwtAuthGuard)
-  findAll(): Promise<Project[]> {
-    return this.projectService.findAll();
+  async findAll(): Promise<{
+    status: string;
+    length: number;
+    data: Project[];
+  }> {
+    const data = await this.projectService.findAll();
+    return {
+      status: 'success',
+      length: data.length,
+      data,
+    };
   }
 
   @Get(':id')
   // @UseGuards(JwtAuthGuard)
-  findOne(@Param('id') id: number): Promise<Project> {
-    return this.projectService.findOne(id);
+  async findOne(
+    @Param('id') id: number,
+  ): Promise<{ status: string; data: Project }> {
+    const data = await this.projectService.findOne(id);
+    return {
+      status: 'success',
+      data,
+    };
   }
 
   @Patch(':id')
@@ -127,12 +145,15 @@ export class ProjectsController {
       project.image_path = imgurLinks.join(',');
       project.image_delete_id = imgurDeleteHash.join(',');
     }
-    return this.projectService.updateProject(id, project);
+    return {
+      status: 'success',
+      data: this.projectService.updateProject(id, project),
+    };
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  async remove(@Param('id') id: number): Promise<void> {
+  async remove(@Param('id') id: number): Promise<{ status: string }> {
     const project = await this.projectService.findOne(id);
     const deleteId = project.image_delete_id.split(',');
     for (const deleteHash of deleteId) {
@@ -142,7 +163,7 @@ export class ProjectsController {
         },
       });
     }
-
-    return this.projectService.remove(id);
+    this.projectService.remove(id);
+    return { status: `success delete project with id ${id}` };
   }
 }

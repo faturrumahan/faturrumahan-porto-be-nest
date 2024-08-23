@@ -22,6 +22,9 @@ export class AuthService {
       process.env.ENCRYPT_KEY || 'secret',
     ).toString(CryptoJS.enc.Utf8);
 
+    console.log('user:', userPassword);
+    console.log('input:', pass);
+
     if (userPassword !== inputPassword || !user) {
       return null;
     }

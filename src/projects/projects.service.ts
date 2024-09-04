@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './projects.entity';
 import { Repository } from 'typeorm';
+import { updateProjectDto } from 'src/dto/updateProjectDto';
 
 @Injectable()
 export class ProjectsService {
@@ -22,7 +23,9 @@ export class ProjectsService {
     return this.projectRepository.findOneBy({ id });
   }
 
-  async updateProject(id: number, project: Project): Promise<Project> {
+  async updateProject(id: number, project: updateProjectDto): Promise<Project> {
+    delete project.deleted_image_path;
+    delete project.in_image_delete_id;
     await this.projectRepository.update({ id }, project);
     return this.projectRepository.findOneBy({ id });
   }

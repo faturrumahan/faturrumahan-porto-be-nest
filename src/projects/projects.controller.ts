@@ -16,6 +16,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import axios from 'axios';
+import { updateProjectDto } from 'src/dto/updateProjectDto';
 
 @Controller('projects')
 export class ProjectsController {
@@ -104,9 +105,34 @@ export class ProjectsController {
   )
   async update(
     @Param('id') id: number,
-    @Body() project: Project,
+    @Body() project: updateProjectDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
+    //delete selected files
+    if (project.in_image_delete_id.length > 0) {
+      const includeDeleteImageId = project.in_image_delete_id.split(',');
+      for (const deleteHash of includeDeleteImageId) {
+        await axios.delete(`https://api.imgur.com/3/image/${deleteHash}`, {
+          headers: {
+            Authorization: `Bearer ${process.env.IMGUR_TOKEN}`,
+          },
+        });
+      }
+
+      const allImagePath = project.image_path.split(',');
+      const deletedImagePath = project.deleted_image_path.split(',');
+      const imagePath = allImagePath.filter(
+        (item) => !deletedImagePath.includes(item),
+      );
+      project.image_path = imagePath.join(',');
+
+      const allImageDeleteId = project.image_delete_id.split(',');
+      const deleteId = allImageDeleteId.filter(
+        (item) => !includeDeleteImageId.includes(item),
+      );
+      project.image_delete_id = deleteId.join(',');
+    }
+
     // upload new image if exist
     if (files.length > 0) {
       const imgurLinks = [];
@@ -132,19 +158,11 @@ export class ProjectsController {
         imgurDeleteHash.push(deleteHash);
       }
 
-      //delete old image from storage
-      const deleteId = project.image_delete_id.split(',');
-      for (const deleteHash of deleteId) {
-        await axios.delete(`https://api.imgur.com/3/image/${deleteHash}`, {
-          headers: {
-            Authorization: `Bearer ${process.env.IMGUR_TOKEN}`,
-          },
-        });
-      }
-
-      project.image_path = imgurLinks.join(',');
-      project.image_delete_id = imgurDeleteHash.join(',');
+      project.image_path = project.image_path + ',' + imgurLinks.join(',');
+      project.image_delete_id =
+        project.image_delete_id + ',' + imgurDeleteHash.join(',');
     }
+
     return {
       status: 'success',
       data: this.projectService.updateProject(id, project),

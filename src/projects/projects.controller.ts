@@ -16,7 +16,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import axios from 'axios';
-import { updateProjectDto } from 'src/dto/updateProjectDto';
+import { updateProjectDto } from '../dto/updateProjectDto';
 
 @Controller('projects')
 export class ProjectsController {
